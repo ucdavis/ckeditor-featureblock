@@ -64,7 +64,10 @@
 
         // Convert any feature-block element into this widget
         upcast: function (element) {
-          return element.name === 'feature-block' || element.hasClass('wysiwyg-feature-block');
+          // Convert legacy markup to the new web component markup.
+          convertLegacyMarkup(element);
+
+          return element.name === 'feature-block';
         },
 
         // Set the widget dialog window name. This enables the automatic widget-dialog binding.
@@ -113,20 +116,23 @@
   /**
    * Convert any old markup into the newer web component markup.
    *
-   * @param {CKEDITOR.dom.element} element
+   * @param {CKEDITOR.htmlParser.element} element
    */
   function convertLegacyMarkup(element) {
     if (element.hasClass('wysiwyg-feature-block')) {
-      // Pull out the old data.
-      var title = element.findOne('.wysiwyg-feature-block__title').getHtml();
-      var content = element.findOne('.wysiwyg-feature-block__body').getHtml();
+      var title = element.getFirst(function (child) {
+        return child.hasClass('wysiwyg-feature-block__title')
+      });
+      var content = element.getFirst(function (child) {
+        return child.hasClass('wysiwyg-feature-block__body')
+      });
 
       // Insert the old data into the new template markup.
-      var newMarkup = '<div slot="title">' + title + '</div>' +
-        '<div slot="body">' + content + '</div>';
+      var newMarkup = '<div slot="title">' + title.getHtml() + '</div>' +
+        '<div slot="body">' + content.getHtml() + '</div>';
 
       element.removeClass('wysiwyg-feature-block');
-      element.renameNode('feature-block');
+      element.name = 'feature-block';
       element.setHtml(newMarkup);
     }
   }
