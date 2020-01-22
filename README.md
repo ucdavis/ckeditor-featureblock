@@ -9,11 +9,12 @@ It also provides an option for alignment within the page.
 
 Markup output:
 ```
-<aside class="wysiwyg-feature-block u-align--right u-width--half">
-  <h3 class="wysiwyg-feature-block__title">Title</h3>
-  <div class="wysiwyg-feature-block__body">
-    <p>Content</p>
-  </div>
-</aside>
-
+<feature-block class="u-width--half u-align--right">
+  <div slot="title">Title</div>
+  <div slot="body"><p>Content</p></div>
+</feature-block>
 ```
+
+This markup can be used as a web component or filtered on output to display any
+desired markup. The advantage of this data model is that it is now based on a
+standard web component.

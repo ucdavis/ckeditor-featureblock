@@ -62,7 +62,7 @@
         // The minimum required for this to work
         requiredContent: 'feature-block',
 
-        // Convert any div with the .wysiwyg-feature-block into this widget
+        // Convert any feature-block element into this widget
         upcast: function (element) {
           return element.name === 'feature-block' || element.hasClass('wysiwyg-feature-block');
         },
