@@ -1,0 +1,17 @@
+feature-block {
+  display: block;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #f2f2f2;
+}
+
+feature-block div[slot] {
+  padding: .5rem;
+  min-height: 1rem;
+  background: #ffffff;
+}
+
+feature-block div[slot="title"] {
+  margin-bottom: 1rem;
+  font-weight: bold;
+}

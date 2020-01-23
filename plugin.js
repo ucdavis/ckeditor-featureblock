@@ -9,9 +9,25 @@
     icons: 'feature_block',
     hidpi: true,
 
+    // Configure CKEditor DTD for custom drupal-entity element.
+    // @see https://www.drupal.org/node/2448449#comment-9717735
+    beforeInit: function (editor) {
+      var dtd = CKEDITOR.dtd;
+
+      dtd['feature-block'] = {'div': 1};
+      for (var tagName in dtd) {
+        if (dtd[tagName].p) {
+          dtd[tagName]['feature-block'] = 1;
+        }
+      }
+    },
+
     init: function (editor) {
       // Register the editing dialog.
       CKEDITOR.dialog.add('feature_block', this.path + 'dialogs/feature_block.js');
+
+      // Add our plugin-specific CSS to style the widget within CKEditor.
+      editor.addContentsCss(this.path + 'css/feature-block.css');
 
       // Add toolbar button for this plugin.
       editor.ui.addButton('feature_block', {
@@ -25,30 +41,33 @@
       editor.widgets.add('feature_block', {
         // Create the HTML template
         template:
-          '<aside class="wysiwyg-feature-block u-align--right u-width--half">' +
-            '<h3 class="wysiwyg-feature-block__title">Title</h3>' +
-            '<div class="wysiwyg-feature-block__body"><p>Content</p></div>' +
-          '</aside>',
+          '<feature-block class="u-width--half u-align--right">' +
+            '<div slot="title">Title</div>' +
+            '<div slot="body"><p>Content</p></div>' +
+          '</feature-block>',
 
         editables: {
           title: {
-            selector: '.wysiwyg-feature-block__title',
+            selector: '[slot="title"]',
             allowedContent: 'span'
           },
           content: {
-            selector: '.wysiwyg-feature-block__body'
+            selector: '[slot="body"]'
           }
         },
 
         // Prevent the editor from removing these elements
-        allowedContent: 'aside(!wysiwyg-feature-block, u-align--right, u-align--left, u-width--half); h3(!wysiwyg-feature-block__title); div(!wysiwyg-feature-block__body)',
+        allowedContent: 'feature-block(u-align--right, u-align--left, u-width--half); div(!slot)',
 
         // The minimum required for this to work
-        requiredContent: 'aside(wysiwyg-feature-block)',
+        requiredContent: 'feature-block',
 
-        // Convert any div with the .wysiwyg-feature-block into this widget
+        // Convert any feature-block element into this widget
         upcast: function (element) {
-          return element.name === 'aside' && element.hasClass('wysiwyg-feature-block');
+          // Convert legacy markup to the new web component markup.
+          convertLegacyMarkup(element);
+
+          return element.name === 'feature-block';
         },
 
         // Set the widget dialog window name. This enables the automatic widget-dialog binding.
@@ -68,6 +87,9 @@
           else {
             this.setData('align', 'none');
           }
+
+          // Convert legacy markup to the new web component markup.
+          convertLegacyMarkup(this.element);
         },
 
         // Listen on the widget#data event which is fired every time the widget data changes
@@ -91,5 +113,28 @@
 
   });
 
+  /**
+   * Convert any old markup into the newer web component markup.
+   *
+   * @param {CKEDITOR.htmlParser.element} element
+   */
+  function convertLegacyMarkup(element) {
+    if (element.hasClass('wysiwyg-feature-block')) {
+      var title = element.getFirst(function (child) {
+        return child.hasClass('wysiwyg-feature-block__title')
+      });
+      var content = element.getFirst(function (child) {
+        return child.hasClass('wysiwyg-feature-block__body')
+      });
+
+      // Insert the old data into the new template markup.
+      var newMarkup = '<div slot="title">' + title.getHtml() + '</div>' +
+        '<div slot="body">' + content.getHtml() + '</div>';
+
+      element.removeClass('wysiwyg-feature-block');
+      element.name = 'feature-block';
+      element.setHtml(newMarkup);
+    }
+  }
 
 })(jQuery);
