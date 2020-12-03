@@ -10,6 +10,7 @@ It also provides an option for alignment within the page.
 Markup output:
 ```
 <feature-block class="u-width--half u-align--right">
+  <div slot="figure"><img src="/my-image.png"></div>
   <div slot="title">Title</div>
   <div slot="body"><p>Content</p></div>
 </feature-block>

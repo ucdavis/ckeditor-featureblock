@@ -31,6 +31,20 @@ CKEDITOR.dialog.add('feature_block', function (editor) {
             commit: function (widget) {
               widget.setData('align', this.getValue());
             }
+          },
+          {
+            id: 'figure',
+            type: 'checkbox',
+            label: 'Show Image or Video',
+
+            setup: function (widget) {
+              if (typeof widget.data.figure !== "undefined") {
+                this.setValue(widget.data.figure);
+              }
+            },
+            commit: function (widget) {
+              widget.setData('figure', this.getValue());
+            }
           }
         ]
       }

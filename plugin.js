@@ -42,11 +42,15 @@
         // Create the HTML template
         template:
           '<feature-block class="u-width--half u-align--right">' +
+            '<div slot="figure">Add an Image or Video</div>' +
             '<div slot="title">Title</div>' +
             '<div slot="body"><p>Content</p></div>' +
           '</feature-block>',
 
         editables: {
+          figure: {
+            selector: '[slot="figure"]'
+          },
           title: {
             selector: '[slot="title"]',
             allowedContent: 'span'
@@ -88,6 +92,11 @@
             this.setData('align', 'none');
           }
 
+          const figure = this.element.getAttribute('figure');
+          if (figure) {
+            this.setData('figure', true);
+          }
+
           // Convert legacy markup to the new web component markup.
           convertLegacyMarkup(this.element);
         },
@@ -104,6 +113,19 @@
           if (this.data.align && this.data.align !== 'none') {
             this.element.addClass('u-width--half');
             this.element.addClass('u-align--' + this.data.align);
+          }
+
+          const figure = this.element.find('[slot="figure"]');
+          if (this.data.figure && this.data.figure === true) {
+            this.element.setAttribute('figure', 'true');
+            if (typeof figure.$[0] !== 'undefined') {
+              figure.$[0].classList.remove('hidden');
+            }
+          } else {
+            this.element.removeAttribute('figure');
+            if (typeof figure.$[0] !== 'undefined') {
+              figure.$[0].classList.add('hidden');
+            }
           }
         }
 
@@ -128,7 +150,7 @@
       });
 
       // Insert the old data into the new template markup.
-      var newMarkup = '<div slot="title">' + title.getHtml() + '</div>' +
+      var newMarkup = '<div slot="figure">Add an Image or Video</div><div slot="title">' + title.getHtml() + '</div>' +
         '<div slot="body">' + content.getHtml() + '</div>';
 
       element.removeClass('wysiwyg-feature-block');
